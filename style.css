@@ -1,0 +1,129 @@
+css
+:root {
+    --bg-color: #121212;
+    --text-color: #e0e0e0;
+    --accent-color: #00d4ff;
+    --danger-color: #ff4d4d;
+    --card-bg: #1e1e1e;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.container {
+    text-align: center;
+    width: 90%;
+    max-width: 500px;
+    background-color: var(--card-bg);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+h1 {
+    font-size: 1rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 1rem;
+}
+
+.timer-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 4.5rem;
+    color: var(--accent-color);
+    margin-bottom: 2rem;
+    line-height: 1;
+}
+
+.timer-display span {
+    display: inline-block;
+    margin: 0 2px;
+}
+
+.controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 3rem;
+}
+
+.btn {
+    padding: 0.8rem 2rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s ease, opacity 0.2s;
+}
+
+.btn:active {
+    transform: scale(0.95);
+}
+
+.primary {
+    background-color: var(--accent-color);
+    color: #000;
+}
+
+.danger {
+    background-color: transparent;
+    border: 2px solid var(--danger-color);
+    color: var(--danger-color);
+}
+
+.secondary {
+    background-color: #333;
+    color: white;
+}
+
+/* Button states handled in JS logic mostly, but this is for reset styling */
+.reset-active {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.laps-container {
+    text-align: left;
+    height: 150px;
+    overflow-y: auto;
+    border-top: 1px solid #333;
+    padding-top: 1rem;
+}
+
+.laps-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.lap-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    background-color: #252525;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+}
+
+.lap-time {
+    color: var(--accent-color);
+    font-weight: bold;
+}
