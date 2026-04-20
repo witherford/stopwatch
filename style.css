@@ -1,4 +1,3 @@
-css
 :root {
     --bg-color: #121212;
     --text-color: #e0e0e0;
@@ -92,7 +91,6 @@ h1 {
     color: white;
 }
 
-/* Button states handled in JS logic mostly, but this is for reset styling */
 .reset-active {
     background-color: var(--danger-color);
     color: white;

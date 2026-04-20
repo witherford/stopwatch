@@ -1,48 +1,51 @@
-javascript
-// Global variables
 let timerInterval;
 let isRunning = false;
-let totalElapsed = 0;
+let elapsedTime = 0;
 let startTime = 0;
 
-// Get DOM elements
+// DOM Elements
 const displayHours = document.getElementById('hours');
 const displayMinutes = document.getElementById('minutes');
 const displaySeconds = document.getElementById('seconds');
 const displayMs = document.getElementById('milliseconds');
 const lapsList = document.getElementById('laps-list');
 const startBtn = document.getElementById('startBtn');
-const resetBtn = document.getElementById('resetBtn');
+const resetBtn = document.getElementById('resetBtn');   // FIXED
 
-// --- Timer Logic ---
+// Format the time string nicely
+function formatTime(ms) {
+    const hours = Math.floor(ms / 3600000);
+    const minutes = Math.floor((ms % 3600000) / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    const milliSeconds = Math.floor((ms % 1000) / 10);
+
+    return [
+        hours.toString().padStart(2, '0'),
+        minutes.toString().padStart(2, '0'),
+        seconds.toString().padStart(2, '0'),
+        milliSeconds.toString().padStart(2, '0'),
+    ];
+}
 
 function updateDisplay() {
-    const now = Date.now();
-    // Calculate time remaining in this interval
-    const elapsed = now - startTime;
-    totalElapsed += elapsed;
-
-    // Breakdown time
-    const hours = Math.floor(totalElapsed / 3600000);
-    const minutes = Math.floor((totalElapsed % 3600000) / 60000);
-    const seconds = Math.floor((totalElapsed % 60000) / 1000);
-    const milliSeconds = Math.floor((totalElapsed % 1000) / 10);
-
-    // Pad with zeros
-    displayHours.innerText = hours.toString().padStart(2, '0');
-    displayMinutes.innerText = minutes.toString().padStart(2, '0');
-    displaySeconds.innerText = seconds.toString().padStart(2, '0');
-    displayMs.innerText = milliSeconds.toString().padStart(2, '0');
+    const timeParts = formatTime(elapsedTime);
+    displayHours.innerText = timeParts[0];
+    displayMinutes.innerText = timeParts[1];
+    displaySeconds.innerText = timeParts[2];
+    displayMs.innerText = timeParts[3];
 }
 
 function startTimer() {
     if (!isRunning) {
         isRunning = true;
         startBtn.innerText = "Pause";
-        startBtn.style.backgroundColor = "#ff4d4d"; // Red for pause
+        startBtn.style.backgroundColor = "#ff4d4d";
+        startTime = Date.now() - elapsedTime;
 
-        // Use 10ms interval for smooth ms updating
-        timerInterval = setInterval(updateDisplay, 10);
+        timerInterval = setInterval(() => {
+            elapsedTime = Date.now() - startTime;
+            updateDisplay();
+        }, 10);
     }
 }
 
@@ -50,43 +53,36 @@ function pauseTimer() {
     if (isRunning) {
         isRunning = false;
         clearInterval(timerInterval);
-        startBtn.innerText = "Start";
-        startBtn.style.backgroundColor = ""; // Reset to default CSS
+        startBtn.innerText = "Resume";
+        startBtn.style.backgroundColor = "";
+        startBtn.classList.add('secondary');
     }
 }
 
 function resetTimer() {
-    if (isRunning) pauseTimer();
-    totalElapsed = 0;
-    lapsList.innerHTML = ""; // Clear lap list
+    clearInterval(timerInterval);
+    isRunning = false;
+    elapsedTime = 0;
     startTime = 0;
+    lapsList.innerHTML = "";
+
     updateDisplay();
     startBtn.innerText = "Start";
-    startBtn.style.backgroundColor = "";
+    startBtn.classList.remove('secondary');
 }
 
 function addLap() {
-    const currentLapTime = totalElapsed;
-    const hours = String(Math.floor(currentLapTime / 3600000)).padStart(2, '0');
-    const minutes = String(Math.floor((currentLapTime % 3600000) / 60000)).padStart(2, '0');
-    const seconds = String(Math.floor((currentLapTime % 60000) / 1000)).padStart(2, '0');
-    const ms = String(Math.floor((currentLapTime % 1000) / 10)).padStart(2, '0');
-    
-    const lapTimeStr = `${hours}:${minutes}:${seconds}.${ms}`;
-    
-    const lapItem = document.createElement('div');
-    lapItem.className = 'lap-item';
-    lapItem.innerHTML = `
+    const li = document.createElement('div');
+    li.classList.add('lap-item');
+
+    li.innerHTML = `
         <span>Lap #${lapsList.children.length + 1}</span>
-        <span class="lap-time">${lapTimeStr}</span>
+        <span class="lap-time">${formatTime(elapsedTime).join(':')}</span>
     `;
-    
-    lapsList.appendChild(lapItem);
+
+    lapsList.appendChild(li);
 }
 
-// --- Event Listeners ---
-
-// Fix: Directly bind events to prevent scope issues
 startBtn.addEventListener('click', () => {
     if (isRunning) {
         pauseTimer();
@@ -97,23 +93,18 @@ startBtn.addEventListener('click', () => {
 
 resetBtn.addEventListener('click', resetTimer);
 
-// Fix: Ensure lap button is added properly
-const container = document.querySelector('.container');
-if (container && lapsList) {
-    const lapBtn = document.createElement('button');
-    lapBtn.innerText = "Lap";
-    lapBtn.className = "secondary btn";
-    lapBtn.style.marginTop = "10px";
-    lapBtn.style.width = "100%";
-    lapBtn.onclick = addLap;
-    container.insertBefore(lapBtn, container.lastElementChild);
-}
-
-// Prevent spacebar from scrolling page
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Space') {
-        e.preventDefault();
-        if (isRunning) pauseTimer();
-        else startTimer();
+        startBtn.click();
     }
 });
+
+// Lap button
+const lapBtn = document.createElement('button');
+lapBtn.innerText = "Lap";
+lapBtn.className = "secondary btn";
+lapBtn.style.marginTop = "10px";
+lapBtn.onclick = addLap;
+
+const container = document.querySelector('.container');
+container.insertBefore(lapBtn, container.lastElementChild);
